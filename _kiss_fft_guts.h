@@ -117,6 +117,13 @@ struct kiss_fft_state{
 	    (res).r -= (a).r;  (res).i -= (a).i; \
     }while(0)
 
+#ifdef kiss_fft_suffix
+#define KISS_ADD_SUFFIX2(x, y) x##y
+#define KISS_ADD_SUFFIX1(x, y) KISS_ADD_SUFFIX2(x, y)
+#define KISS_ADD_SUFFIX(x) KISS_ADD_SUFFIX1(x, kiss_fft_suffix)
+#else
+#define KISS_ADD_SUFFIX(x) x
+#endif
 
 #ifdef FIXED_POINT
 #  define KISS_FFT_COS(phase)  floor(.5+SAMP_MAX * cos (phase))
@@ -127,9 +134,9 @@ struct kiss_fft_state{
 #  define KISS_FFT_SIN(phase) _mm_set1_ps( sin(phase) )
 #  define HALF_OF(x) ((x)*_mm_set1_ps(.5))
 #else
-#  define KISS_FFT_COS(phase) (kiss_fft_scalar) cos(phase)
-#  define KISS_FFT_SIN(phase) (kiss_fft_scalar) sin(phase)
-#  define HALF_OF(x) ((x)*.5)
+#  define KISS_FFT_COS(phase) (kiss_fft_scalar) KISS_ADD_SUFFIX(cos)(phase)
+#  define KISS_FFT_SIN(phase) (kiss_fft_scalar) KISS_ADD_SUFFIX(sin)(phase)
+#  define HALF_OF(x) ((x)*KISS_ADD_SUFFIX(.5))
 #endif
 
 #define  kf_cexp(x,phase) \
